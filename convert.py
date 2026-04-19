@@ -39,9 +39,9 @@ def convert():
             "opened": clean_text(row.get('Date/Time Opened')),
             "subject": clean_text(row.get('Subject')),
             "origin": clean_text(row.get('Origin')),
-            "doctorId": clean_text(row.get('Doctor ID')),   # ✅ FIXED
+            "doctorId": clean_text(row.get('Doctor ID')),
             "reopened": clean_text(row.get('Reopened Date')),
-            "timeline": split_timeline(row.get('app comments'))  # ✅ UPGRADED
+            "timeline": split_timeline(row.get('app comments'))
         })
 
     with open('data.json', 'w') as f:
