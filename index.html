@@ -2,146 +2,168 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SR Tracker</title>
 
 <style>
-body {
-  font-family: 'Segoe UI';
-  background: #f5f7fb;
-  text-align:center;
-  padding:40px;
+body{font-family:'Segoe UI';background:#f5f7fb;text-align:center;padding:40px}
+h1{margin-bottom:10px}
+
+input{
+  width:500px;padding:14px;border-radius:30px;
+  border:2px solid #ddd;font-size:16px;
 }
 
-input {
-  width:450px;
-  padding:12px;
-  border-radius:25px;
-  border:1px solid #ccc;
-  font-size:16px;
+.chips{margin-top:10px}
+.chip{
+  display:inline-block;padding:6px 12px;margin:5px;
+  border-radius:20px;background:#eee;cursor:pointer;
+}
+.chip.active{background:#2563eb;color:#fff}
+
+#suggestions{
+  width:500px;margin:10px auto;text-align:left;
+  background:white;border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-.card {
-  background:white;
-  margin:20px auto;
-  width:700px;
-  border-radius:12px;
+.s-item{padding:10px;border-bottom:1px solid #eee;cursor:pointer}
+.s-item:hover{background:#f1f5f9}
+
+.card{
+  background:white;margin:20px auto;width:700px;
+  border-radius:12px;padding:20px;text-align:left;
   box-shadow:0 4px 12px rgba(0,0,0,0.1);
-  text-align:left;
-  padding:20px;
 }
 
-.header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+.header{display:flex;justify-content:space-between}
+.badge{padding:5px 10px;border-radius:20px;font-size:12px;background:#facc15}
 
-.badge {
-  background:#facc15;
-  padding:5px 10px;
-  border-radius:20px;
-  font-size:12px;
-}
-
-.section {
-  margin-top:15px;
-}
-
-.timeline {
-  margin-top:15px;
-  border-left:2px solid #ddd;
-  padding-left:15px;
-}
-
-.timeline-item {
-  margin-bottom:10px;
-}
-
-.date {
-  color:blue;
-  font-size:12px;
-  font-weight:bold;
-}
+.timeline{border-left:2px solid #ddd;padding-left:15px;margin-top:10px}
+.timeline-item{margin-bottom:8px}
+.hl{background:yellow}
 </style>
 </head>
 
 <body>
 
-<h2>🔍 SR Tracker</h2>
+<h1>🔍 SR Tracker</h1>
+<input id="search" placeholder="Search SR, name, keyword">
 
-<input type="text" id="search" placeholder="Search SR or name...">
+<div class="chips">
+  <span class="chip" data="Reopen">Reopen</span>
+  <span class="chip" data="Closed">Closed</span>
+  <span class="chip" data="Working">Working</span>
+  <span class="chip" data="Resolution">Resolution</span>
+  <span class="chip" data="Waiting">Waiting</span>
+</div>
 
-<div id="results">Loading...</div>
+<div id="suggestions"></div>
+<div id="results"></div>
 
 <script>
-let DATA = [];
+let DATA=[],FILTER="",IDX={};
 
-fetch("data.json?v=" + Date.now())
-.then(res => res.json())
-.then(json => {
-  DATA = json;
-  document.getElementById("results").innerHTML = "";
+// load data
+fetch("data.json?v="+Date.now())
+.then(r=>r.json())
+.then(json=>{
+  DATA=json;
+  json.forEach(r=>{
+    if(r.sr){
+      IDX[r.sr.toLowerCase()]=r;
+      IDX[r.sr.replace(/^SR/i,"").toLowerCase()]=r;
+    }
+  });
 });
 
-function searchData(q){
-  q = q.toLowerCase();
-  return DATA.filter(r =>
-    (r.sr && r.sr.toLowerCase().includes(q)) ||
-    (r.name && r.name.toLowerCase().includes(q))
-  );
+// highlight
+function hl(text,q){
+  if(!q)return text;
+  return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
 }
 
-function render(list){
-  const el = document.getElementById("results");
+// ranking
+function rank(r,q){
+  q=q.toLowerCase();
+  if(r.sr && r.sr.toLowerCase()===q) return 100;
+  if(r.sr && r.sr.toLowerCase().startsWith(q)) return 90;
+  if(r.name && r.name.toLowerCase().startsWith(q)) return 80;
+  if(r.name && r.name.toLowerCase().includes(q)) return 70;
+  if(r.status && r.status.toLowerCase().includes(q)) return 60;
+  return 0;
+}
 
-  if(!list.length){
-    el.innerHTML = "No result found";
-    return;
-  }
+// search
+function srch(q){
+  if(!q)return[];
+  let res=DATA.filter(r=>{
+    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
+           (r.name&&r.name.toLowerCase().includes(q))||
+           (r.status&&r.status.toLowerCase().includes(q));
+    let f=FILTER? r.status===FILTER:true;
+    return ok&&f;
+  });
+  return res.sort((a,b)=>rank(b,q)-rank(a,q));
+}
 
-  el.innerHTML = list.map(r => `
-    <div class="card">
+// suggestions
+function showSug(list,q){
+  let el=document.getElementById("suggestions");
+  if(!q){el.innerHTML="";return;}
+  el.innerHTML=list.slice(0,5).map(r=>
+    `<div class="s-item" onclick="selectSR('${r.sr}')">
+      ${hl(r.sr,q)} - ${hl(r.name||"",q)}
+    </div>`
+  ).join("");
+}
 
-      <div class="header">
-        <div>
-          <b>${r.sr}</b> &nbsp; ${r.name}
-        </div>
-        <div class="badge">${r.status}</div>
-      </div>
-
-      <div class="section">
-        <b>Subject & Issue</b><br>
-        ${r.subject || '-'}
-      </div>
-
-      <div class="section">
-        <b>Owner:</b> ${r.owner || '-'}<br>
-        <b>Opened:</b> ${r.opened || '-'}
-      </div>
-
-      <div class="section">
-        <b>Activity Timeline</b>
-        <div class="timeline">
-          ${(r.comments || '').split('|').map(c => `
-            <div class="timeline-item">
-              <div class="date">•</div>
-              <div>${c}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
+// render full card
+function render(r,q){
+  let el=document.getElementById("results");
+  if(!r){el.innerHTML="";return;}
+  el.innerHTML=`
+  <div class="card">
+    <div class="header">
+      <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
+      <div class="badge">${r.status}</div>
     </div>
-  `).join("");
+
+    <div><b>Subject:</b> ${r.subject||"-"}</div>
+    <div><b>Owner:</b> ${r.owner||"-"} | <b>Opened:</b> ${r.opened||"-"}</div>
+
+    <div class="timeline">
+      ${(r.comments||"").split("|").map(c=>`
+        <div class="timeline-item">• ${c}</div>
+      `).join("")}
+    </div>
+  </div>`;
 }
 
-document.getElementById("search").addEventListener("input", function(){
-  const q = this.value.trim();
-  if(q.length < 2){
-    document.getElementById("results").innerHTML = "";
-    return;
+// select from suggestion
+function selectSR(sr){
+  document.getElementById("search").value=sr;
+  document.getElementById("suggestions").innerHTML="";
+  let r=IDX[sr.toLowerCase()];
+  render(r,sr);
+}
+
+// typing
+document.getElementById("search").addEventListener("input",function(){
+  let q=this.value.trim().toLowerCase();
+  let res=srch(q);
+  showSug(res,q);
+  if(res.length===1) render(res[0],q);
+});
+
+// chips
+document.querySelectorAll(".chip").forEach(c=>{
+  c.onclick=function(){
+    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    if(FILTER===this.dataset.data){FILTER="";}
+    else{FILTER=this.dataset.data;this.classList.add("active");}
+    document.getElementById("search").dispatchEvent(new Event("input"));
   }
-  render(searchData(q));
 });
 </script>
 
