@@ -1,77 +1,156 @@
-<!-- KEEP EVERYTHING SAME ABOVE... ONLY CHANGE SCRIPT PART -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SR Tracker</title>
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f7fb;
+  text-align: center;
+  padding: 40px;
+}
+
+h1 { font-size: 32px; }
+
+input {
+  width: 400px;
+  padding: 12px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.chips {
+  margin-top: 15px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 5px;
+  border-radius: 20px;
+  background: #eee;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chip.active {
+  background: #2563eb;
+  color: white;
+}
+
+#results {
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin: 10px auto;
+  width: 420px;
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.status {
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔍 SR Tracker</h1>
+
+<input type="text" id="search" placeholder="Search SR, name, keyword...">
+
+<div class="chips">
+  <span class="chip" data-status="Reopen">Reopen</span>
+  <span class="chip" data-status="Closed">Closed</span>
+  <span class="chip" data-status="Working">Working</span>
+  <span class="chip" data-status="Resolution">Resolution</span>
+  <span class="chip" data-status="Waiting">Waiting</span>
+</div>
+
+<div id="results">Loading...</div>
 
 <script>
-
 let DATA = [];
-let IDX = {};
+let FILTER = "";
 
-fetch('data.json?v=' + Date.now())
-  .then(r => r.json())
-  .then(json => {
-    DATA = json;
+// Load JSON
+fetch("data.json?v=" + Date.now())
+.then(res => res.json())
+.then(json => {
+  DATA = json;
+  document.getElementById("results").innerHTML = "Ready";
+});
 
-    // Build index
-    DATA.forEach(function(r){
-      if(r.sr){
-        IDX[r.sr.toLowerCase()] = r;
-        IDX[r.sr.replace(/^SR/i,"").toLowerCase()] = r;
-      }
-    });
+// Search logic
+function searchData(q) {
+  q = q.toLowerCase();
+  return DATA.filter(r => {
+    let matchText =
+      (r.sr && r.sr.toLowerCase().includes(q)) ||
+      (r.name && r.name.toLowerCase().includes(q)) ||
+      (r.status && r.status.toLowerCase().includes(q));
+
+    let matchFilter = FILTER ? r.status === FILTER : true;
+
+    return matchText && matchFilter;
   });
-
-var lq="";
-
-// 🔍 SEARCH FUNCTION
-function srch(q){
-  q=(q||"").trim();
-  if(!q)return[];
-  var ql=q.toLowerCase();
-
-  if(IDX[ql]) return [IDX[ql]];
-
-  return DATA.filter(r =>
-    (r.sr && r.sr.toLowerCase().includes(ql)) ||
-    (r.name && r.name.toLowerCase().includes(ql)) ||
-    (r.status && r.status.toLowerCase().includes(ql))
-  );
 }
 
-// 🎨 CARD UI
-function card(r){
-return `
-<div class="src">
-  <div class="sch">
-    <span class="srn">${r.sr}</span>
-    <span class="snam">${r.name}</span>
-    <span class="sst ${r.status.toLowerCase()}">${r.status}</span>
-  </div>
+// Render cards
+function render(list) {
+  const el = document.getElementById("results");
 
-  <div class="ssub">${r.subject || ''}</div>
-
-  <div class="sflds">
-    <div class="sfld"><b>Owner:</b> ${r.owner}</div>
-    <div class="sfld"><b>Opened:</b> ${r.opened}</div>
-  </div>
-</div>
-`;
-}
-
-// 🧠 RENDER
-function render(res){
-  const el = document.getElementById("hRes");
-
-  if(!res.length){
+  if (!list.length) {
     el.innerHTML = "No results found";
     return;
   }
 
-  el.innerHTML = res.map(card).join("");
+  el.innerHTML = list.map(r => `
+    <div class="card">
+      <h3>${r.sr}</h3>
+      <p><b>Status:</b> <span class="status">${r.status}</span></p>
+      <p><b>Name:</b> ${r.name || "-"}</p>
+      <p><b>Owner:</b> ${r.owner || "-"}</p>
+    </div>
+  `).join("");
 }
 
-// 🔍 SEARCH INPUT
-document.getElementById("hi").addEventListener("input", function(){
-  const q = this.value;
-  render(srch(q));
+// Input typing
+document.getElementById("search").addEventListener("input", function() {
+  const q = this.value.trim();
+  if (q.length < 1 && !FILTER) {
+    document.getElementById("results").innerHTML = "";
+    return;
+  }
+  render(searchData(q));
 });
 
+// Chip filter
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", function() {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+
+    if (FILTER === this.dataset.status) {
+      FILTER = "";
+    } else {
+      FILTER = this.dataset.status;
+      this.classList.add("active");
+    }
+
+    const q = document.getElementById("search").value.trim();
+    render(searchData(q));
+  });
+});
 </script>
+
+</body>
+</html>
