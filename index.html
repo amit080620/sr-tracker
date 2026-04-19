@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SR Tracker</title>
+</head>
+<body>
+
+<h2>🔍 SR Tracker</h2>
+
+<input type="text" id="search" placeholder="Enter SR Number">
+<div id="result">Loading...</div>
+
+<script>
+let DATA = {};
+
+fetch("data.json?v=" + new Date().getTime())
+.then(res => res.json())
+.then(json => {
+  json.forEach(item => {
+    DATA[item.sr.toLowerCase()] = item;
+  });
+  document.getElementById("result").innerHTML = "Ready";
+});
+
+document.getElementById("search").addEventListener("input", function(){
+  let val = this.value.toLowerCase().trim();
+
+  if(val.length < 2){
+    document.getElementById("result").innerHTML = "";
+    return;
+  }
+
+  let found = DATA[val];
+
+  if(found){
+    document.getElementById("result").innerHTML =
+      "<b>" + found.sr + "</b><br>Status: " + found.status;
+  } else {
+    document.getElementById("result").innerHTML = "No record found";
+  }
+});
+</script>
+
+</body>
+</html>
