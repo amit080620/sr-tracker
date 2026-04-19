@@ -1,112 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>SR Tracker</title>
-
-<style>
-body {
-  font-family: 'Segoe UI', Arial;
-  background: #f1f5f9;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-}
-
-.container {
-  text-align:center;
-  width:100%;
-}
-
-h1 {
-  font-size:40px;
-  margin-bottom:20px;
-}
-
-input {
-  width:400px;
-  padding:12px;
-  font-size:18px;
-  border-radius:25px;
-  border:1px solid #ccc;
-  outline:none;
-}
-
-input:focus {
-  border-color:#2563eb;
-}
-
-.result {
-  margin-top:20px;
-}
-
-.card {
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  width:400px;
-  margin:10px auto;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
-  text-align:left;
-}
-
-.status {
-  font-weight:bold;
-  color:#2563eb;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-  <h1>🔍 SR Tracker</h1>
-
-  <input type="text" id="search" placeholder="Enter SR Number...">
-
-  <div class="result" id="result">Loading...</div>
-</div>
+<!-- KEEP EVERYTHING SAME ABOVE... ONLY CHANGE SCRIPT PART -->
 
 <script>
-let DATA = {};
 
-fetch("data.json?v=" + new Date().getTime())
-.then(res => res.json())
-.then(json => {
-  json.forEach(item => {
-    if(item.sr){
-      DATA[item.sr.toLowerCase()] = item;
-      DATA[item.sr.replace(/^SR/i,"").toLowerCase()] = item;
-    }
+let DATA = [];
+let IDX = {};
+
+fetch('data.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(json => {
+    DATA = json;
+
+    // Build index
+    DATA.forEach(function(r){
+      if(r.sr){
+        IDX[r.sr.toLowerCase()] = r;
+        IDX[r.sr.replace(/^SR/i,"").toLowerCase()] = r;
+      }
+    });
   });
-  document.getElementById("result").innerHTML = "Ready ✅";
-});
 
-document.getElementById("search").addEventListener("input", function(){
-  let val = this.value.toLowerCase().trim();
+var lq="";
 
-  if(val.length < 2){
-    document.getElementById("result").innerHTML = "";
+// 🔍 SEARCH FUNCTION
+function srch(q){
+  q=(q||"").trim();
+  if(!q)return[];
+  var ql=q.toLowerCase();
+
+  if(IDX[ql]) return [IDX[ql]];
+
+  return DATA.filter(r =>
+    (r.sr && r.sr.toLowerCase().includes(ql)) ||
+    (r.name && r.name.toLowerCase().includes(ql)) ||
+    (r.status && r.status.toLowerCase().includes(ql))
+  );
+}
+
+// 🎨 CARD UI
+function card(r){
+return `
+<div class="src">
+  <div class="sch">
+    <span class="srn">${r.sr}</span>
+    <span class="snam">${r.name}</span>
+    <span class="sst ${r.status.toLowerCase()}">${r.status}</span>
+  </div>
+
+  <div class="ssub">${r.subject || ''}</div>
+
+  <div class="sflds">
+    <div class="sfld"><b>Owner:</b> ${r.owner}</div>
+    <div class="sfld"><b>Opened:</b> ${r.opened}</div>
+  </div>
+</div>
+`;
+}
+
+// 🧠 RENDER
+function render(res){
+  const el = document.getElementById("hRes");
+
+  if(!res.length){
+    el.innerHTML = "No results found";
     return;
   }
 
-  let found = DATA[val];
+  el.innerHTML = res.map(card).join("");
+}
 
-  if(found){
-    document.getElementById("result").innerHTML =
-      `<div class="card">
-        <h3>${found.sr}</h3>
-        <p><b>Status:</b> <span class="status">${found.status}</span></p>
-        <p><b>Name:</b> ${found.name || "-"}</p>
-        <p><b>Owner:</b> ${found.owner || "-"}</p>
-      </div>`;
-  } else {
-    document.getElementById("result").innerHTML = "❌ No record found";
-  }
+// 🔍 SEARCH INPUT
+document.getElementById("hi").addEventListener("input", function(){
+  const q = this.value;
+  render(srch(q));
 });
-</script>
 
-</body>
-</html>
+</script>
