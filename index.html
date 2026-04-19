@@ -6,49 +6,119 @@
 <title>SR Tracker</title>
 
 <style>
-body{font-family:'Segoe UI';background:#f5f7fb;text-align:center;padding:40px}
-h1{margin-bottom:10px}
-
-input{
-  width:500px;padding:14px;border-radius:30px;
-  border:2px solid #ddd;font-size:16px;
+body{
+  font-family:'Segoe UI';
+  background:#f5f7fb;
+  text-align:center;
+  padding:40px;
 }
 
-.chips{margin-top:10px}
+h1{
+  font-size:32px;
+}
+
+/* 🔍 Search Box */
+.search-box{
+  position:relative;
+  width:520px;
+  margin:20px auto;
+}
+
+.search-box input{
+  width:100%;
+  padding:14px 50px;
+  border-radius:30px;
+  border:2px solid #ddd;
+  font-size:16px;
+}
+
+/* 🔥 Animated Icon */
+.search-icon{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+  0%{transform:translateY(-50%) scale(1);}
+  50%{transform:translateY(-50%) scale(1.2);}
+  100%{transform:translateY(-50%) scale(1);}
+}
+
+/* Chips */
+.chips{margin-top:10px;}
 .chip{
-  display:inline-block;padding:6px 12px;margin:5px;
-  border-radius:20px;background:#eee;cursor:pointer;
+  display:inline-block;
+  padding:6px 12px;
+  margin:5px;
+  border-radius:20px;
+  background:#eee;
+  cursor:pointer;
 }
 .chip.active{background:#2563eb;color:#fff}
 
-#suggestions{
-  width:500px;margin:10px auto;text-align:left;
-  background:white;border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-.s-item{padding:10px;border-bottom:1px solid #eee;cursor:pointer}
-.s-item:hover{background:#f1f5f9}
-
+/* Card */
 .card{
-  background:white;margin:20px auto;width:700px;
-  border-radius:12px;padding:20px;text-align:left;
+  background:white;
+  margin:20px auto;
+  width:750px;
+  border-radius:12px;
+  padding:20px;
+  text-align:left;
   box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 
-.header{display:flex;justify-content:space-between}
-.badge{padding:5px 10px;border-radius:20px;font-size:12px;background:#facc15}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-.timeline{border-left:2px solid #ddd;padding-left:15px;margin-top:10px}
-.timeline-item{margin-bottom:8px}
-.hl{background:yellow}
+.badge{
+  background:#facc15;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+/* Timeline */
+.timeline{
+  border-left:2px solid #ddd;
+  padding-left:15px;
+  margin-top:10px;
+}
+
+.timeline-item{
+  margin-bottom:10px;
+}
+
+.dot{
+  color:#2563eb;
+  font-weight:bold;
+}
+
+.hl{background:yellow;}
 </style>
 </head>
 
 <body>
 
 <h1>🔍 SR Tracker</h1>
-<input id="search" placeholder="Search SR, name, keyword">
+
+<div class="search-box">
+  <span class="search-icon">🔍</span>
+  <input id="search" placeholder="Search SR, name, keyword...">
+</div>
 
 <div class="chips">
   <span class="chip" data="Reopen">Reopen</span>
@@ -58,7 +128,6 @@ input{
   <span class="chip" data="Waiting">Waiting</span>
 </div>
 
-<div id="suggestions"></div>
 <div id="results"></div>
 
 <script>
@@ -79,89 +148,93 @@ fetch("data.json?v="+Date.now())
 
 // highlight
 function hl(text,q){
-  if(!q)return text;
+  if(!q) return text;
   return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
-}
-
-// ranking
-function rank(r,q){
-  q=q.toLowerCase();
-  if(r.sr && r.sr.toLowerCase()===q) return 100;
-  if(r.sr && r.sr.toLowerCase().startsWith(q)) return 90;
-  if(r.name && r.name.toLowerCase().startsWith(q)) return 80;
-  if(r.name && r.name.toLowerCase().includes(q)) return 70;
-  if(r.status && r.status.toLowerCase().includes(q)) return 60;
-  return 0;
 }
 
 // search
 function srch(q){
-  if(!q)return[];
-  let res=DATA.filter(r=>{
+  if(!q) return [];
+  return DATA.filter(r=>{
     let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
            (r.name&&r.name.toLowerCase().includes(q))||
            (r.status&&r.status.toLowerCase().includes(q));
     let f=FILTER? r.status===FILTER:true;
     return ok&&f;
   });
-  return res.sort((a,b)=>rank(b,q)-rank(a,q));
 }
 
-// suggestions
-function showSug(list,q){
-  let el=document.getElementById("suggestions");
-  if(!q){el.innerHTML="";return;}
-  el.innerHTML=list.slice(0,5).map(r=>
-    `<div class="s-item" onclick="selectSR('${r.sr}')">
-      ${hl(r.sr,q)} - ${hl(r.name||"",q)}
-    </div>`
-  ).join("");
-}
-
-// render full card
+// render
 function render(r,q){
   let el=document.getElementById("results");
-  if(!r){el.innerHTML="";return;}
+
+  if(!r){
+    el.innerHTML="";
+    return;
+  }
+
   el.innerHTML=`
   <div class="card">
+
     <div class="header">
       <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
       <div class="badge">${r.status}</div>
     </div>
 
-    <div><b>Subject:</b> ${r.subject||"-"}</div>
-    <div><b>Owner:</b> ${r.owner||"-"} | <b>Opened:</b> ${r.opened||"-"}</div>
-
-    <div class="timeline">
-      ${(r.comments||"").split("|").map(c=>`
-        <div class="timeline-item">• ${c}</div>
-      `).join("")}
+    <div style="margin-top:10px;">
+      <b>Subject:</b> ${r.subject||"-"}
     </div>
-  </div>`;
-}
 
-// select from suggestion
-function selectSR(sr){
-  document.getElementById("search").value=sr;
-  document.getElementById("suggestions").innerHTML="";
-  let r=IDX[sr.toLowerCase()];
-  render(r,sr);
+    <div class="grid">
+      <div><b>Owner</b><br>${r.owner||"-"}</div>
+      <div><b>Opened</b><br>${r.opened||"-"}</div>
+      <div><b>Reopened</b><br>${r.reopened||"-"}</div>
+      <div><b>Origin</b><br>${r.origin||"-"}</div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b>Doctor ID:</b> ${r.doctor_id||"-"}
+    </div>
+
+    <div style="margin-top:10px;">
+      <b>Activity Timeline</b>
+      <div class="timeline">
+        ${(r.comments||[]).map(c=>`
+          <div class="timeline-item">
+            <span class="dot">●</span> ${c}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+  </div>
+  `;
 }
 
 // typing
 document.getElementById("search").addEventListener("input",function(){
   let q=this.value.trim().toLowerCase();
   let res=srch(q);
-  showSug(res,q);
-  if(res.length===1) render(res[0],q);
+
+  if(res.length===1){
+    render(res[0],q);
+  } else {
+    document.getElementById("results").innerHTML="";
+  }
 });
 
 // chips
 document.querySelectorAll(".chip").forEach(c=>{
   c.onclick=function(){
     document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-    if(FILTER===this.dataset.data){FILTER="";}
-    else{FILTER=this.dataset.data;this.classList.add("active");}
+
+    if(FILTER===this.dataset.data){
+      FILTER="";
+    } else {
+      FILTER=this.dataset.data;
+      this.classList.add("active");
+    }
+
     document.getElementById("search").dispatchEvent(new Event("input"));
   }
 });
