@@ -1,14 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>SR Tracker</title>
+
+<style>
+body {
+  font-family: 'Segoe UI', Arial;
+  background: #f1f5f9;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+}
+
+.container {
+  text-align:center;
+  width:100%;
+}
+
+h1 {
+  font-size:40px;
+  margin-bottom:20px;
+}
+
+input {
+  width:400px;
+  padding:12px;
+  font-size:18px;
+  border-radius:25px;
+  border:1px solid #ccc;
+  outline:none;
+}
+
+input:focus {
+  border-color:#2563eb;
+}
+
+.result {
+  margin-top:20px;
+}
+
+.card {
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  width:400px;
+  margin:10px auto;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  text-align:left;
+}
+
+.status {
+  font-weight:bold;
+  color:#2563eb;
+}
+</style>
 </head>
+
 <body>
 
-<h2>🔍 SR Tracker</h2>
+<div class="container">
+  <h1>🔍 SR Tracker</h1>
 
-<input type="text" id="search" placeholder="Enter SR Number">
-<div id="result">Loading...</div>
+  <input type="text" id="search" placeholder="Enter SR Number...">
+
+  <div class="result" id="result">Loading...</div>
+</div>
 
 <script>
 let DATA = {};
@@ -17,9 +76,12 @@ fetch("data.json?v=" + new Date().getTime())
 .then(res => res.json())
 .then(json => {
   json.forEach(item => {
-    DATA[item.sr.toLowerCase()] = item;
+    if(item.sr){
+      DATA[item.sr.toLowerCase()] = item;
+      DATA[item.sr.replace(/^SR/i,"").toLowerCase()] = item;
+    }
   });
-  document.getElementById("result").innerHTML = "Ready";
+  document.getElementById("result").innerHTML = "Ready ✅";
 });
 
 document.getElementById("search").addEventListener("input", function(){
@@ -34,9 +96,14 @@ document.getElementById("search").addEventListener("input", function(){
 
   if(found){
     document.getElementById("result").innerHTML =
-      "<b>" + found.sr + "</b><br>Status: " + found.status;
+      `<div class="card">
+        <h3>${found.sr}</h3>
+        <p><b>Status:</b> <span class="status">${found.status}</span></p>
+        <p><b>Name:</b> ${found.name || "-"}</p>
+        <p><b>Owner:</b> ${found.owner || "-"}</p>
+      </div>`;
   } else {
-    document.getElementById("result").innerHTML = "No record found";
+    document.getElementById("result").innerHTML = "❌ No record found";
   }
 });
 </script>
