@@ -1,0 +1,23 @@
+name: Auto Update Data
+on:
+  push:
+    paths:
+      - 'data.xlsx'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install pandas openpyxl
+      - run: python convert.py
+      - name: Push to Site
+        run: |
+          git config --global user.name 'Ashvik-Bot'
+          git config --global user.email 'bot@github.com'
+          git add data.json
+          git commit -m "Updated search database" || exit 0
+          git push
