@@ -3,92 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SR Tracker</title>
+<title>SR Tracker SaaS</title>
 
 <style>
+:root{
+  --bg:#f4f6fb;
+  --card:#fff;
+  --primary:#2563eb;
+}
+
 *{box-sizing:border-box;}
 
 body{
-  font-family:'Segoe UI', sans-serif;
-  background:#f5f7fb;
   margin:0;
+  font-family:Segoe UI;
+  background:var(--bg);
+}
+
+/* Layout */
+.app{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  min-height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+  background:#111827;
+  color:white;
   padding:20px;
 }
-
-/* Container */
-.container{
-  max-width:900px;
-  margin:auto;
-  text-align:center;
-}
-
-/* Header */
-h1{
-  margin-bottom:10px;
-}
-
-/* Search */
-.search-box{
-  position:relative;
-  margin:20px auto;
-}
-
-.search-box input{
-  width:100%;
-  padding:14px 50px;
-  border-radius:30px;
-  border:2px solid #ddd;
-  font-size:16px;
-}
-
-.search-icon{
-  position:absolute;
-  left:15px;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:18px;
-  animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-  0%{transform:translateY(-50%) scale(1);}
-  50%{transform:translateY(-50%) scale(1.2);}
-  100%{transform:translateY(-50%) scale(1);}
-}
-
-/* Chips */
-.chips{
-  margin-top:10px;
-}
-.chip{
-  display:inline-block;
-  padding:6px 12px;
-  margin:5px;
-  border-radius:20px;
-  background:#eee;
+.sidebar h2{margin-bottom:20px;}
+.sidebar div{
+  margin:10px 0;
+  color:#9ca3af;
   cursor:pointer;
 }
-.chip.active{
-  background:#2563eb;
-  color:#fff;
-}
+.sidebar div:hover{color:white;}
 
-/* Card */
-.card{
-  background:white;
-  margin-top:20px;
-  border-radius:12px;
+/* Main */
+.main{
   padding:20px;
-  text-align:left;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Header */
-.header{
+/* Top */
+.topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  flex-wrap:wrap;
+}
+
+.search-box{
+  position:relative;
+  width:350px;
+}
+.search-box input{
+  width:100%;
+  padding:10px 40px;
+  border-radius:20px;
+  border:1px solid #ddd;
+}
+.search-box span{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+/* Stats */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;
+  margin-top:20px;
+}
+.stat{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+}
+
+/* Table */
+.table{
+  margin-top:20px;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+}
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  padding:12px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+.row:hover{background:#f9fafb;}
+
+/* Detail */
+.detail{
+  margin-top:20px;
+  background:white;
+  padding:20px;
+  border-radius:10px;
 }
 
 .badge{
@@ -98,170 +114,114 @@ h1{
   font-size:12px;
 }
 
-/* Responsive Grid */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:10px;
-  margin-top:10px;
-}
-
 /* Timeline */
 .timeline{
   border-left:2px solid #ddd;
-  padding-left:15px;
-  margin-top:10px;
+  padding-left:10px;
+}
+.timeline div{
+  margin-bottom:8px;
 }
 
-.timeline-item{
-  margin-bottom:10px;
-  position:relative;
-}
-
-.timeline-item::before{
-  content:"";
-  position:absolute;
-  left:-9px;
-  top:5px;
-  width:10px;
-  height:10px;
-  background:#2563eb;
-  border-radius:50%;
-}
-
-.hl{
-  background:yellow;
-}
-
-/* Mobile Fix */
-@media(max-width:600px){
-  h1{font-size:22px;}
+/* Mobile */
+@media(max-width:800px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .row{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<h1>🔍 SR Tracker</h1>
-
-<div class="search-box">
-  <span class="search-icon">🔍</span>
-  <input id="search" placeholder="Search SR, name, keyword...">
+<div class="sidebar">
+  <h2>SR Tracker</h2>
+  <div>Dashboard</div>
+  <div>Cases</div>
 </div>
 
-<div class="chips">
-  <span class="chip" data="Reopen">Reopen</span>
-  <span class="chip" data="Closed">Closed</span>
-  <span class="chip" data="Working">Working</span>
-  <span class="chip" data="Resolution">Resolution</span>
-  <span class="chip" data="Waiting">Waiting</span>
+<div class="main">
+
+<div class="topbar">
+  <h2>Dashboard</h2>
+  <div class="search-box">
+    <span>🔍</span>
+    <input id="search" placeholder="Search SR or name">
+  </div>
 </div>
 
-<div id="results"></div>
+<div class="stats">
+  <div class="stat">Total: <span id="total"></span></div>
+  <div class="stat">Open: <span id="open"></span></div>
+  <div class="stat">Closed: <span id="closed"></span></div>
+</div>
 
+<div id="table" class="table"></div>
+
+<div id="detail"></div>
+
+</div>
 </div>
 
 <script>
-let DATA=[],FILTER="",IDX={};
+let DATA=[];
 
 fetch("data.json?v="+Date.now())
 .then(r=>r.json())
 .then(json=>{
   DATA=json;
-  json.forEach(r=>{
-    if(r.sr){
-      IDX[r.sr.toLowerCase()]=r;
-      IDX[r.sr.replace(/^SR/i,"").toLowerCase()]=r;
-    }
-  });
+  stats();
+  table(DATA);
 });
 
-function hl(text,q){
-  if(!q) return text;
-  return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
+function stats(){
+  document.getElementById("total").innerText=DATA.length;
+  document.getElementById("open").innerText=
+    DATA.filter(x=>x.status!="Closed").length;
+  document.getElementById("closed").innerText=
+    DATA.filter(x=>x.status=="Closed").length;
 }
 
-function srch(q){
-  if(!q) return [];
-  return DATA.filter(r=>{
-    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
-           (r.name&&r.name.toLowerCase().includes(q))||
-           (r.status&&r.status.toLowerCase().includes(q));
-    let f=FILTER? r.status===FILTER:true;
-    return ok&&f;
-  });
+function table(list){
+  document.getElementById("table").innerHTML=
+    list.map(r=>`
+      <div class="row" onclick="detail('${r.sr}')">
+        <div>${r.sr}</div>
+        <div>${r.name||"-"}</div>
+        <div>${r.owner||"-"}</div>
+        <div>${r.status}</div>
+      </div>
+    `).join("");
 }
 
-function render(r,q){
-  let el=document.getElementById("results");
-
-  if(!r){
-    el.innerHTML="";
-    return;
-  }
-
-  el.innerHTML=`
-  <div class="card">
-
-    <div class="header">
-      <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
+function detail(sr){
+  let r=DATA.find(x=>x.sr==sr);
+  document.getElementById("detail").innerHTML=`
+    <div class="detail">
+      <h3>${r.sr} ${r.name}</h3>
       <div class="badge">${r.status}</div>
-    </div>
 
-    <div style="margin-top:10px;">
-      <b>Subject:</b> ${r.subject||"-"}
-    </div>
+      <p><b>Subject:</b> ${r.subject||"-"}</p>
+      <p><b>Owner:</b> ${r.owner||"-"}</p>
+      <p><b>Opened:</b> ${r.opened||"-"}</p>
 
-    <div class="grid">
-      <div><b>Owner</b><br>${r.owner||"-"}</div>
-      <div><b>Opened</b><br>${r.opened||"-"}</div>
-      <div><b>Reopened</b><br>${r.reopened||"-"}</div>
-      <div><b>Origin</b><br>${r.origin||"-"}</div>
-    </div>
-
-    <div style="margin-top:10px;">
-      <b>Doctor ID:</b> ${r.doctor_id||"-"}
-    </div>
-
-    <div style="margin-top:10px;">
-      <b>Activity Timeline</b>
+      <h4>Timeline</h4>
       <div class="timeline">
-        ${(r.comments||[]).map(c=>`
-          <div class="timeline-item">${c}</div>
-        `).join("")}
+        ${(r.comments||[]).map(c=>`<div>${c}</div>`).join("")}
       </div>
     </div>
-
-  </div>
   `;
 }
 
 document.getElementById("search").addEventListener("input",function(){
-  let q=this.value.trim().toLowerCase();
-  let res=srch(q);
-
-  if(res.length===1){
-    render(res[0],q);
-  } else {
-    document.getElementById("results").innerHTML="";
-  }
-});
-
-document.querySelectorAll(".chip").forEach(c=>{
-  c.onclick=function(){
-    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-
-    if(FILTER===this.dataset.data){
-      FILTER="";
-    } else {
-      FILTER=this.dataset.data;
-      this.classList.add("active");
-    }
-
-    document.getElementById("search").dispatchEvent(new Event("input"));
-  }
+  let q=this.value.toLowerCase();
+  let res=DATA.filter(r=>
+    (r.sr && r.sr.toLowerCase().includes(q)) ||
+    (r.name && r.name.toLowerCase().includes(q))
+  );
+  table(res);
 });
 </script>
 
