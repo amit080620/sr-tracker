@@ -1,154 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SR Tracker</title>
 
 <style>
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI';
   background: #f5f7fb;
-  text-align: center;
-  padding: 40px;
+  text-align:center;
+  padding:40px;
 }
-
-h1 { font-size: 32px; }
 
 input {
-  width: 400px;
-  padding: 12px;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-.chips {
-  margin-top: 15px;
-}
-
-.chip {
-  display: inline-block;
-  padding: 6px 12px;
-  margin: 5px;
-  border-radius: 20px;
-  background: #eee;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.chip.active {
-  background: #2563eb;
-  color: white;
-}
-
-#results {
-  margin-top: 20px;
+  width:450px;
+  padding:12px;
+  border-radius:25px;
+  border:1px solid #ccc;
+  font-size:16px;
 }
 
 .card {
-  background: white;
-  padding: 15px;
-  margin: 10px auto;
-  width: 420px;
-  border-radius: 12px;
-  text-align: left;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background:white;
+  margin:20px auto;
+  width:700px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  text-align:left;
+  padding:20px;
 }
 
-.status {
-  font-weight: bold;
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.badge {
+  background:#facc15;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.section {
+  margin-top:15px;
+}
+
+.timeline {
+  margin-top:15px;
+  border-left:2px solid #ddd;
+  padding-left:15px;
+}
+
+.timeline-item {
+  margin-bottom:10px;
+}
+
+.date {
+  color:blue;
+  font-size:12px;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔍 SR Tracker</h1>
+<h2>🔍 SR Tracker</h2>
 
-<input type="text" id="search" placeholder="Search SR, name, keyword...">
-
-<div class="chips">
-  <span class="chip" data-status="Reopen">Reopen</span>
-  <span class="chip" data-status="Closed">Closed</span>
-  <span class="chip" data-status="Working">Working</span>
-  <span class="chip" data-status="Resolution">Resolution</span>
-  <span class="chip" data-status="Waiting">Waiting</span>
-</div>
+<input type="text" id="search" placeholder="Search SR or name...">
 
 <div id="results">Loading...</div>
 
 <script>
 let DATA = [];
-let FILTER = "";
 
-// Load JSON
 fetch("data.json?v=" + Date.now())
 .then(res => res.json())
 .then(json => {
   DATA = json;
-  document.getElementById("results").innerHTML = "Ready";
+  document.getElementById("results").innerHTML = "";
 });
 
-// Search logic
-function searchData(q) {
+function searchData(q){
   q = q.toLowerCase();
-  return DATA.filter(r => {
-    let matchText =
-      (r.sr && r.sr.toLowerCase().includes(q)) ||
-      (r.name && r.name.toLowerCase().includes(q)) ||
-      (r.status && r.status.toLowerCase().includes(q));
-
-    let matchFilter = FILTER ? r.status === FILTER : true;
-
-    return matchText && matchFilter;
-  });
+  return DATA.filter(r =>
+    (r.sr && r.sr.toLowerCase().includes(q)) ||
+    (r.name && r.name.toLowerCase().includes(q))
+  );
 }
 
-// Render cards
-function render(list) {
+function render(list){
   const el = document.getElementById("results");
 
-  if (!list.length) {
-    el.innerHTML = "No results found";
+  if(!list.length){
+    el.innerHTML = "No result found";
     return;
   }
 
   el.innerHTML = list.map(r => `
     <div class="card">
-      <h3>${r.sr}</h3>
-      <p><b>Status:</b> <span class="status">${r.status}</span></p>
-      <p><b>Name:</b> ${r.name || "-"}</p>
-      <p><b>Owner:</b> ${r.owner || "-"}</p>
+
+      <div class="header">
+        <div>
+          <b>${r.sr}</b> &nbsp; ${r.name}
+        </div>
+        <div class="badge">${r.status}</div>
+      </div>
+
+      <div class="section">
+        <b>Subject & Issue</b><br>
+        ${r.subject || '-'}
+      </div>
+
+      <div class="section">
+        <b>Owner:</b> ${r.owner || '-'}<br>
+        <b>Opened:</b> ${r.opened || '-'}
+      </div>
+
+      <div class="section">
+        <b>Activity Timeline</b>
+        <div class="timeline">
+          ${(r.comments || '').split('|').map(c => `
+            <div class="timeline-item">
+              <div class="date">•</div>
+              <div>${c}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
     </div>
   `).join("");
 }
 
-// Input typing
-document.getElementById("search").addEventListener("input", function() {
+document.getElementById("search").addEventListener("input", function(){
   const q = this.value.trim();
-  if (q.length < 1 && !FILTER) {
+  if(q.length < 2){
     document.getElementById("results").innerHTML = "";
     return;
   }
   render(searchData(q));
-});
-
-// Chip filter
-document.querySelectorAll(".chip").forEach(chip => {
-  chip.addEventListener("click", function() {
-    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-
-    if (FILTER === this.dataset.status) {
-      FILTER = "";
-    } else {
-      FILTER = this.dataset.status;
-      this.classList.add("active");
-    }
-
-    const q = document.getElementById("search").value.trim();
-    render(searchData(q));
-  });
 });
 </script>
 
