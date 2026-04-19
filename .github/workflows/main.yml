@@ -1,19 +1,29 @@
 name: Auto Update Data
+
 on:
   push:
     paths:
       - 'data.xlsx'
+
+permissions:
+  contents: write   # 🔥 IMPORTANT FIX
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - run: pip install pandas openpyxl
+
       - run: python convert.py
+
       - name: Push to Site
         run: |
           git config --global user.name 'Ashvik-Bot'
