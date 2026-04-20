@@ -6,22 +6,14 @@
     "owner": "DoctorRx Queue",
     "opened": "18/4/2026 12:12 pm",
     "subject": "Not getting appointments",
-    "origin": "Phone",
-    "doctorId": "911711200824903001",
-    "reopened": "20/4/2026 10:53 am",
-    "timeline": [
-      {
-        "date": "18/4",
-        "text": "inform on mail"
-      },
-      {
-        "date": "18-04-26",
-        "text": "AMit- Inform that his profile is visible he may get appt"
-      },
-      {
-        "date": "18/04",
-        "text": "Anuja - 1 Query details :-  doc told not getting apt but his normal plan is their e was disputing a lot he want refund told him to give proof he told he dont ha"
-      }
+    "origin": "",
+    "doctor_id": "",
+    "reopened": "",
+    "comments": [
+      "18/4 inform on mail",
+      "18-04-26- AMit- Inform that his profile is visible he may get appt",
+      "18/04 Anuja - 1 Query",
+      "details :-  doc told not getting apt but his normal plan is their e was disputing a lot he want refund told him to give proof he told he dont ha"
     ]
   },
   {
@@ -31,18 +23,13 @@
     "owner": "DRx RCB Queue",
     "opened": "13/4/2026 10:44 am",
     "subject": "Request a callback",
-    "origin": "DoctorRx",
-    "doctorId": "911733905691618001",
+    "origin": "",
+    "doctor_id": "",
     "reopened": "",
-    "timeline": [
-      {
-        "date": "20/4",
-        "text": "10:36 Ringing"
-      },
-      {
-        "date": "15/04",
-        "text": "Anuja - 1 Query details :-2:46 Ringing"
-      }
+    "comments": [
+      "20/4 10:36 Ringing",
+      "15/04 Anuja - 1 Query",
+      "details :-2:46 Ringing"
     ]
   },
   {
@@ -52,18 +39,13 @@
     "owner": "DRx RCB Queue",
     "opened": "14/4/2026 11:32 am",
     "subject": "Request a callback",
-    "origin": "DoctorRx",
-    "doctorId": "331544166441561831",
+    "origin": "",
+    "doctor_id": "",
     "reopened": "",
-    "timeline": [
-      {
-        "date": "15/4",
-        "text": "1:52 Ringing"
-      },
-      {
-        "date": "14/04",
-        "text": "Anuja - 1 Query details :-11:35 Ringing"
-      }
+    "comments": [
+      "15/4 1:52 Ringing",
+      "14/04 Anuja - 1 Query",
+      "details :-11:35 Ringing"
     ]
   },
   {
@@ -73,14 +55,13 @@
     "owner": "DRx RCB Queue",
     "opened": "14/4/2026 11:37 am",
     "subject": "Request a callback",
-    "origin": "DoctorRx",
-    "doctorId": "3226250354215687",
+    "origin": "",
+    "doctor_id": "",
     "reopened": "",
-    "timeline": [
-      {
-        "date": "15/04",
-        "text": "Anuja - 2 Query details :- 2:21 Ringing 11:46 Ringing"
-      }
+    "comments": [
+      "15/04 Anuja - 2 Query",
+      "details :- 2:21 Ringing",
+      "11:46 Ringing"
     ]
   },
   {
@@ -90,14 +71,13 @@
     "owner": "DRx RCB Queue",
     "opened": "14/4/2026 12:52 pm",
     "subject": "Request a callback",
-    "origin": "DoctorRx",
-    "doctorId": "416847892623281338",
+    "origin": "",
+    "doctor_id": "",
     "reopened": "",
-    "timeline": [
-      {
-        "date": "15/04",
-        "text": "Anuja - 1 Query details :-2:20 Ringing 11:41 Ringing"
-      }
+    "comments": [
+      "15/04 Anuja - 1 Query",
+      "details :-2:20 Ringing",
+      "11:41 Ringing"
     ]
   },
   {
@@ -107,18 +87,13 @@
     "owner": "DoctorRx Queue",
     "opened": "14/4/2026 2:05 pm",
     "subject": "consultant addition",
-    "origin": "Phone",
-    "doctorId": "911763705151815147",
+    "origin": "",
+    "doctor_id": "",
     "reopened": "",
-    "timeline": [
-      {
-        "date": "20/4",
-        "text": "cb later 1:30"
-      },
-      {
-        "date": "15/04",
-        "text": "Anuja - 1 Query details :-12:03 Ringing"
-      }
+    "comments": [
+      "20/4 cb later 1:30",
+      "15/04 Anuja - 1 Query",
+      "details :-12:03 Ringing"
     ]
   }
 ]
