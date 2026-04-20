@@ -5,9 +5,6 @@ on:
     paths:
       - 'data.xlsx'
 
-permissions:
-  contents: write   # 🔥 IMPORTANT FIX
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +21,16 @@ jobs:
 
       - run: python convert.py
 
-      - name: Push to Site
+      - name: Commit & Push if changed
         run: |
-          git config --global user.name 'Ashvik-Bot'
-          git config --global user.email 'bot@github.com'
+          git config --global user.name "bot"
+          git config --global user.email "bot@github.com"
+
           git add data.json
-          git commit -m "Updated search database" || exit 0
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Updated data"
+            git push
+          fi
