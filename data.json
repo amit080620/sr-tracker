@@ -1,19 +1,124 @@
 [
   {
-    "sr": "SR10436049",
-    "name": "Puneet Agarwal",
+    "sr": "SR10523307",
+    "name": "Veeresh Patage",
     "status": "Reopen",
     "owner": "DoctorRx Queue",
-    "opened": "10/4/2026 11:24 am",
-    "subject": "E clinic link",
-    "origin": "",
-    "doctor_id": "",
+    "opened": "18/4/2026 12:12 pm",
+    "subject": "Not getting appointments",
+    "origin": "Phone",
+    "doctorId": "911711200824903001",
+    "reopened": "20/4/2026 10:53 am",
+    "timeline": [
+      {
+        "date": "18/4",
+        "text": "inform on mail"
+      },
+      {
+        "date": "18-04-26",
+        "text": "AMit- Inform that his profile is visible he may get appt"
+      },
+      {
+        "date": "18/04",
+        "text": "Anuja - 1 Query details :-  doc told not getting apt but his normal plan is their e was disputing a lot he want refund told him to give proof he told he dont ha"
+      }
+    ]
+  },
+  {
+    "sr": "SR10464319",
+    "name": "Prathima Deepak SS",
+    "status": "Working",
+    "owner": "DRx RCB Queue",
+    "opened": "13/4/2026 10:44 am",
+    "subject": "Request a callback",
+    "origin": "DoctorRx",
+    "doctorId": "911733905691618001",
     "reopened": "",
-    "comments": [
-      "10/4 - Prerna - we got it checked from backend - there is no such issue - ask dr to refresh and then check - if same issue - ask dr. to share creds",
-      "10/4 - Prerna - raised to Yogita",
-      "10/04 Anuja - 3 Query",
-      "details :- doc told hi is not abot to add any"
+    "timeline": [
+      {
+        "date": "20/4",
+        "text": "10:36 Ringing"
+      },
+      {
+        "date": "15/04",
+        "text": "Anuja - 1 Query details :-2:46 Ringing"
+      }
+    ]
+  },
+  {
+    "sr": "SR10477365",
+    "name": "Nishit Trivedi",
+    "status": "Working",
+    "owner": "DRx RCB Queue",
+    "opened": "14/4/2026 11:32 am",
+    "subject": "Request a callback",
+    "origin": "DoctorRx",
+    "doctorId": "331544166441561831",
+    "reopened": "",
+    "timeline": [
+      {
+        "date": "15/4",
+        "text": "1:52 Ringing"
+      },
+      {
+        "date": "14/04",
+        "text": "Anuja - 1 Query details :-11:35 Ringing"
+      }
+    ]
+  },
+  {
+    "sr": "SR10477441",
+    "name": "Yash Devckar",
+    "status": "Working",
+    "owner": "DRx RCB Queue",
+    "opened": "14/4/2026 11:37 am",
+    "subject": "Request a callback",
+    "origin": "DoctorRx",
+    "doctorId": "3226250354215687",
+    "reopened": "",
+    "timeline": [
+      {
+        "date": "15/04",
+        "text": "Anuja - 2 Query details :- 2:21 Ringing 11:46 Ringing"
+      }
+    ]
+  },
+  {
+    "sr": "SR10478855",
+    "name": "BD Gupta",
+    "status": "Working",
+    "owner": "DRx RCB Queue",
+    "opened": "14/4/2026 12:52 pm",
+    "subject": "Request a callback",
+    "origin": "DoctorRx",
+    "doctorId": "416847892623281338",
+    "reopened": "",
+    "timeline": [
+      {
+        "date": "15/04",
+        "text": "Anuja - 1 Query details :-2:20 Ringing 11:41 Ringing"
+      }
+    ]
+  },
+  {
+    "sr": "SR10480092",
+    "name": "Garipelli Rajendra",
+    "status": "Working",
+    "owner": "DoctorRx Queue",
+    "opened": "14/4/2026 2:05 pm",
+    "subject": "consultant addition",
+    "origin": "Phone",
+    "doctorId": "911763705151815147",
+    "reopened": "",
+    "timeline": [
+      {
+        "date": "20/4",
+        "text": "cb later 1:30"
+      },
+      {
+        "date": "15/04",
+        "text": "Anuja - 1 Query details :-12:03 Ringing"
+      }
     ]
   }
 ]
