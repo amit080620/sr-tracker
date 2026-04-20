@@ -14,12 +14,8 @@ body{
 }
 
 .container{
-  max-width:900px;
+  max-width:720px;
   margin:auto;
-}
-
-h1{
-  text-align:center;
 }
 
 /* SEARCH */
@@ -32,47 +28,86 @@ h1{
   width:100%;
   padding:14px 50px;
   border-radius:30px;
-  border:2px solid #ddd;
+  border:2px solid #e5e7eb;
+  font-size:15px;
+  outline:none;
 }
 
+.search-box input:focus{
+  border-color:#4285f4;
+  box-shadow:0 0 0 3px rgba(66,133,244,0.2);
+}
+
+/* Google color animated icon */
 .search-icon{
   position:absolute;
   left:15px;
   top:50%;
   transform:translateY(-50%);
+  font-weight:bold;
+  font-size:18px;
+  animation:googleColor 2s infinite;
+}
+
+@keyframes googleColor{
+  0%{color:#4285F4;}
+  25%{color:#EA4335;}
+  50%{color:#FBBC05;}
+  75%{color:#34A853;}
+  100%{color:#4285F4;}
+}
+
+/* CHIPS */
+.chips{
+  margin-top:10px;
+}
+
+.chip{
+  display:inline-block;
+  padding:6px 12px;
+  margin:4px;
+  border-radius:20px;
+  background:#eef2ff;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.chip.active{
+  background:#2563eb;
+  color:#fff;
 }
 
 /* CARD */
 .card{
   background:white;
   border-radius:12px;
-  margin-top:20px;
+  margin-top:16px;
   overflow:hidden;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  box-shadow:0 3px 8px rgba(0,0,0,0.06);
+  font-size:14px;
 }
 
 /* HEADER */
 .card-top{
   display:flex;
   justify-content:space-between;
-  padding:15px 20px;
-  align-items:center;
+  padding:12px 16px;
 }
 
 .badge{
   background:#facc15;
-  padding:6px 12px;
+  padding:4px 10px;
   border-radius:20px;
-  font-size:12px;
+  font-size:11px;
 }
 
-/* SUBJECT SECTION */
+/* SUBJECT */
 .subject{
   background:#f8fafc;
-  padding:12px 20px;
+  padding:10px 16px;
   border-top:1px solid #eee;
   border-bottom:1px solid #eee;
-  color:#555;
+  font-size:13px;
 }
 
 /* GRID */
@@ -83,7 +118,7 @@ h1{
 }
 
 .info div{
-  padding:15px;
+  padding:10px;
   border-right:1px solid #eee;
 }
 
@@ -92,60 +127,66 @@ h1{
 }
 
 .label{
-  font-size:12px;
+  font-size:11px;
   color:#888;
 }
 
 .value{
-  font-weight:500;
+  font-size:13px;
 }
 
-/* DOCTOR ID */
+/* DOCTOR */
 .doc{
-  padding:15px 20px;
+  padding:10px 16px;
   border-bottom:1px solid #eee;
 }
 
 /* TIMELINE */
 .timeline{
-  padding:20px;
+  padding:14px 16px;
 }
 
 .timeline-title{
-  font-size:12px;
+  font-size:11px;
   color:#888;
   margin-bottom:10px;
 }
 
 .timeline-item{
   display:flex;
-  gap:10px;
-  margin-bottom:15px;
+  gap:8px;
+  margin-bottom:10px;
 }
 
 .dot{
-  width:8px;
-  height:8px;
+  width:6px;
+  height:6px;
   background:#2563eb;
   border-radius:50%;
   margin-top:6px;
 }
 
-.t-content{
-  font-size:14px;
-}
-
 .date{
-  font-weight:600;
+  font-size:12px;
   color:#2563eb;
   display:block;
-  margin-bottom:3px;
+}
+
+.text{
+  font-size:13px;
+  color:#333;
 }
 
 .hl{
   background:yellow;
 }
 
+/* MOBILE */
+@media(max-width:600px){
+  .info{
+    grid-template-columns:1fr 1fr;
+  }
+}
 </style>
 </head>
 
@@ -153,11 +194,19 @@ h1{
 
 <div class="container">
 
-<h1>🔍 SR Tracker</h1>
+<h2>SR Tracker</h2>
 
 <div class="search-box">
-  <span class="search-icon">🔍</span>
-  <input id="search" placeholder="Search SR or Name">
+  <span class="search-icon">G</span>
+  <input id="search" placeholder="Search SR number, name...">
+</div>
+
+<div class="chips">
+  <span class="chip" data="Reopen">Reopen</span>
+  <span class="chip" data="Closed">Closed</span>
+  <span class="chip" data="Working">Working</span>
+  <span class="chip" data="Resolution">Resolution</span>
+  <span class="chip" data="Waiting">Waiting</span>
 </div>
 
 <div id="results"></div>
@@ -166,7 +215,7 @@ h1{
 
 <script>
 
-let DATA=[];
+let DATA=[],FILTER="";
 
 fetch("data.json?v="+Date.now())
 .then(r=>r.json())
@@ -179,10 +228,12 @@ function hl(t,q){
 
 function srch(q){
   q=q.toLowerCase();
-  return DATA.filter(r=>
-    (r.sr&&r.sr.toLowerCase().includes(q)) ||
-    (r.name&&r.name.toLowerCase().includes(q))
-  );
+  return DATA.filter(r=>{
+    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
+           (r.name&&r.name.toLowerCase().includes(q));
+    let f=FILTER? r.status===FILTER:true;
+    return ok && f;
+  });
 }
 
 function render(list,q){
@@ -204,27 +255,26 @@ function render(list,q){
     </div>
 
     <div class="subject">
-      <b>SUBJECT & ISSUE</b><br>
-      ${r.subject || "-"}
+      <b>Subject & Issue</b><br>
+      ${r.subject||"-"}
     </div>
 
     <div class="info">
-      <div><span class="label">OWNER</span><br><span class="value">${r.owner}</span></div>
-      <div><span class="label">OPENED</span><br><span class="value">${r.opened}</span></div>
-      <div><span class="label">REOPENED</span><br><span class="value">${r.reopened || "-"}</span></div>
-      <div><span class="label">ORIGIN</span><br><span class="value">${r.origin || "-"}</span></div>
+      <div><span class="label">Owner</span><br><span class="value">${r.owner}</span></div>
+      <div><span class="label">Opened</span><br><span class="value">${r.opened}</span></div>
+      <div><span class="label">Reopened</span><br><span class="value">${r.reopened||"-"}</span></div>
+      <div><span class="label">Origin</span><br><span class="value">${r.origin||"-"}</span></div>
     </div>
 
     <div class="doc">
-      <span class="label">DOCTOR ID</span><br>
-      ${r.doctor_id || "-"}
+      <span class="label">Doctor ID</span><br>
+      ${r.doctor_id||"-"}
     </div>
 
     <div class="timeline">
-      <div class="timeline-title">ACTIVITY TIMELINE</div>
+      <div class="timeline-title">Activity Timeline</div>
 
       ${(r.comments||[]).map(c=>{
-
         let parts=c.split(" ");
         let date=parts[0];
         let text=parts.slice(1).join(" ");
@@ -232,12 +282,11 @@ function render(list,q){
         return `
         <div class="timeline-item">
           <div class="dot"></div>
-          <div class="t-content">
+          <div>
             <span class="date">${date}</span>
-            ${hl(text,q)}
+            <span class="text">${hl(text,q)}</span>
           </div>
-        </div>
-        `;
+        </div>`;
       }).join("")}
 
     </div>
@@ -249,6 +298,15 @@ function render(list,q){
 
 document.getElementById("search").addEventListener("input",function(){
   render(srch(this.value),this.value);
+});
+
+document.querySelectorAll(".chip").forEach(c=>{
+  c.onclick=function(){
+    FILTER = FILTER===this.dataset.data ? "" : this.dataset.data;
+    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    if(FILTER) this.classList.add("active");
+    document.getElementById("search").dispatchEvent(new Event("input"));
+  }
 });
 
 </script>
