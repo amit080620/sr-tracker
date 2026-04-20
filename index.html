@@ -6,31 +6,26 @@
 <title>SR Tracker</title>
 
 <style>
-*{box-sizing:border-box;}
-
 body{
-  font-family:'Segoe UI', sans-serif;
-  background:#f5f7fb;
+  font-family:'Segoe UI',sans-serif;
+  background:#f3f5f9;
   margin:0;
   padding:20px;
 }
 
-/* Container */
 .container{
   max-width:900px;
   margin:auto;
+}
+
+h1{
   text-align:center;
 }
 
-/* Header */
-h1{
-  margin-bottom:10px;
-}
-
-/* Search */
+/* SEARCH */
 .search-box{
   position:relative;
-  margin:20px auto;
+  margin:20px 0;
 }
 
 .search-box input{
@@ -38,7 +33,6 @@ h1{
   padding:14px 50px;
   border-radius:30px;
   border:2px solid #ddd;
-  font-size:16px;
 }
 
 .search-icon{
@@ -46,97 +40,112 @@ h1{
   left:15px;
   top:50%;
   transform:translateY(-50%);
-  font-size:18px;
-  animation:pulse 1.5s infinite;
 }
 
-@keyframes pulse{
-  0%{transform:translateY(-50%) scale(1);}
-  50%{transform:translateY(-50%) scale(1.2);}
-  100%{transform:translateY(-50%) scale(1);}
-}
-
-/* Chips */
-.chips{
-  margin-top:10px;
-}
-.chip{
-  display:inline-block;
-  padding:6px 12px;
-  margin:5px;
-  border-radius:20px;
-  background:#eee;
-  cursor:pointer;
-}
-.chip.active{
-  background:#2563eb;
-  color:#fff;
-}
-
-/* Card */
+/* CARD */
 .card{
   background:white;
-  margin-top:20px;
   border-radius:12px;
-  padding:20px;
-  text-align:left;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  margin-top:20px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* Header */
-.header{
+/* HEADER */
+.card-top{
   display:flex;
   justify-content:space-between;
+  padding:15px 20px;
   align-items:center;
-  flex-wrap:wrap;
 }
 
 .badge{
   background:#facc15;
-  padding:5px 10px;
+  padding:6px 12px;
   border-radius:20px;
   font-size:12px;
 }
 
-/* Responsive Grid */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:10px;
-  margin-top:10px;
+/* SUBJECT SECTION */
+.subject{
+  background:#f8fafc;
+  padding:12px 20px;
+  border-top:1px solid #eee;
+  border-bottom:1px solid #eee;
+  color:#555;
 }
 
-/* Timeline */
+/* GRID */
+.info{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid #eee;
+}
+
+.info div{
+  padding:15px;
+  border-right:1px solid #eee;
+}
+
+.info div:last-child{
+  border-right:none;
+}
+
+.label{
+  font-size:12px;
+  color:#888;
+}
+
+.value{
+  font-weight:500;
+}
+
+/* DOCTOR ID */
+.doc{
+  padding:15px 20px;
+  border-bottom:1px solid #eee;
+}
+
+/* TIMELINE */
 .timeline{
-  border-left:2px solid #ddd;
-  padding-left:15px;
-  margin-top:10px;
+  padding:20px;
+}
+
+.timeline-title{
+  font-size:12px;
+  color:#888;
+  margin-bottom:10px;
 }
 
 .timeline-item{
-  margin-bottom:10px;
-  position:relative;
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
 }
 
-.timeline-item::before{
-  content:"";
-  position:absolute;
-  left:-9px;
-  top:5px;
-  width:10px;
-  height:10px;
+.dot{
+  width:8px;
+  height:8px;
   background:#2563eb;
   border-radius:50%;
+  margin-top:6px;
+}
+
+.t-content{
+  font-size:14px;
+}
+
+.date{
+  font-weight:600;
+  color:#2563eb;
+  display:block;
+  margin-bottom:3px;
 }
 
 .hl{
   background:yellow;
 }
 
-/* Mobile Fix */
-@media(max-width:600px){
-  h1{font-size:22px;}
-}
 </style>
 </head>
 
@@ -148,15 +157,7 @@ h1{
 
 <div class="search-box">
   <span class="search-icon">🔍</span>
-  <input id="search" placeholder="Search SR, name, keyword...">
-</div>
-
-<div class="chips">
-  <span class="chip" data="Reopen">Reopen</span>
-  <span class="chip" data="Closed">Closed</span>
-  <span class="chip" data="Working">Working</span>
-  <span class="chip" data="Resolution">Resolution</span>
-  <span class="chip" data="Waiting">Waiting</span>
+  <input id="search" placeholder="Search SR or Name">
 </div>
 
 <div id="results"></div>
@@ -164,105 +165,92 @@ h1{
 </div>
 
 <script>
-let DATA=[],FILTER="",IDX={};
+
+let DATA=[];
 
 fetch("data.json?v="+Date.now())
 .then(r=>r.json())
-.then(json=>{
-  DATA=json;
-  json.forEach(r=>{
-    if(r.sr){
-      IDX[r.sr.toLowerCase()]=r;
-      IDX[r.sr.replace(/^SR/i,"").toLowerCase()]=r;
-    }
-  });
-});
+.then(json=>DATA=json);
 
-function hl(text,q){
-  if(!q) return text;
-  return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
+function hl(t,q){
+  if(!q) return t;
+  return t.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
 }
 
 function srch(q){
-  if(!q) return [];
-  return DATA.filter(r=>{
-    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
-           (r.name&&r.name.toLowerCase().includes(q))||
-           (r.status&&r.status.toLowerCase().includes(q));
-    let f=FILTER? r.status===FILTER:true;
-    return ok&&f;
-  });
+  q=q.toLowerCase();
+  return DATA.filter(r=>
+    (r.sr&&r.sr.toLowerCase().includes(q)) ||
+    (r.name&&r.name.toLowerCase().includes(q))
+  );
 }
 
-function render(r,q){
+function render(list,q){
+
   let el=document.getElementById("results");
 
-  if(!r){
-    el.innerHTML="";
+  if(!list.length){
+    el.innerHTML="No results";
     return;
   }
 
-  el.innerHTML=`
+  el.innerHTML=list.map(r=>`
+
   <div class="card">
 
-    <div class="header">
+    <div class="card-top">
       <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
       <div class="badge">${r.status}</div>
     </div>
 
-    <div style="margin-top:10px;">
-      <b>Subject:</b> ${r.subject||"-"}
+    <div class="subject">
+      <b>SUBJECT & ISSUE</b><br>
+      ${r.subject || "-"}
     </div>
 
-    <div class="grid">
-      <div><b>Owner</b><br>${r.owner||"-"}</div>
-      <div><b>Opened</b><br>${r.opened||"-"}</div>
-      <div><b>Reopened</b><br>${r.reopened||"-"}</div>
-      <div><b>Origin</b><br>${r.origin||"-"}</div>
+    <div class="info">
+      <div><span class="label">OWNER</span><br><span class="value">${r.owner}</span></div>
+      <div><span class="label">OPENED</span><br><span class="value">${r.opened}</span></div>
+      <div><span class="label">REOPENED</span><br><span class="value">${r.reopened || "-"}</span></div>
+      <div><span class="label">ORIGIN</span><br><span class="value">${r.origin || "-"}</span></div>
     </div>
 
-    <div style="margin-top:10px;">
-      <b>Doctor ID:</b> ${r.doctor_id||"-"}
+    <div class="doc">
+      <span class="label">DOCTOR ID</span><br>
+      ${r.doctor_id || "-"}
     </div>
 
-    <div style="margin-top:10px;">
-      <b>Activity Timeline</b>
-      <div class="timeline">
-        ${(r.comments||[]).map(c=>`
-          <div class="timeline-item">${c}</div>
-        `).join("")}
-      </div>
+    <div class="timeline">
+      <div class="timeline-title">ACTIVITY TIMELINE</div>
+
+      ${(r.comments||[]).map(c=>{
+
+        let parts=c.split(" ");
+        let date=parts[0];
+        let text=parts.slice(1).join(" ");
+
+        return `
+        <div class="timeline-item">
+          <div class="dot"></div>
+          <div class="t-content">
+            <span class="date">${date}</span>
+            ${hl(text,q)}
+          </div>
+        </div>
+        `;
+      }).join("")}
+
     </div>
 
   </div>
-  `;
+
+  `).join("");
 }
 
 document.getElementById("search").addEventListener("input",function(){
-  let q=this.value.trim().toLowerCase();
-  let res=srch(q);
-
-  if(res.length===1){
-    render(res[0],q);
-  } else {
-    document.getElementById("results").innerHTML="";
-  }
+  render(srch(this.value),this.value);
 });
 
-document.querySelectorAll(".chip").forEach(c=>{
-  c.onclick=function(){
-    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-
-    if(FILTER===this.dataset.data){
-      FILTER="";
-    } else {
-      FILTER=this.dataset.data;
-      this.classList.add("active");
-    }
-
-    document.getElementById("search").dispatchEvent(new Event("input"));
-  }
-});
 </script>
 
 </body>
