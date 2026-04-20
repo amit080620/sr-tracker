@@ -1,125 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SR Tracker</title>
-
-<style>
-body{font-family:'Segoe UI';background:#f5f7fb;margin:0}
-.container{max-width:900px;margin:auto;padding:20px}
-
-h1{text-align:center}
-
-/* Search */
-.search-box{position:relative;margin:20px auto}
-.search-box input{
-  width:100%;padding:14px 50px;
-  border-radius:30px;border:2px solid #ddd;
-}
-.search-icon{
-  position:absolute;left:15px;top:50%;
-  transform:translateY(-50%);
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{
-  0%{transform:translateY(-50%) scale(1)}
-  50%{transform:translateY(-50%) scale(1.2)}
-  100%{transform:translateY(-50%) scale(1)}
-}
-
-/* Chips */
-.chips{text-align:center}
-.chip{
-  display:inline-block;padding:6px 12px;margin:5px;
-  border-radius:20px;background:#eee;cursor:pointer
-}
-.chip.active{background:#2563eb;color:#fff}
-
-/* Card */
-.card{
-  background:#fff;margin-top:20px;padding:20px;
-  border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)
-}
-
-.header{
-  display:flex;justify-content:space-between;flex-wrap:wrap
-}
-.badge{
-  background:#facc15;padding:5px 10px;border-radius:20px
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:10px;margin-top:10px
-}
-
-.timeline{
-  border-left:2px solid #ddd;padding-left:15px;margin-top:10px
-}
-.timeline-item{margin-bottom:10px;position:relative}
-.timeline-item::before{
-  content:"";position:absolute;left:-9px;top:5px;
-  width:10px;height:10px;background:#2563eb;border-radius:50%
-}
-
-.hl{background:yellow}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>🔍 SR Tracker</h1>
-
-<div class="search-box">
-  <span class="search-icon">🔍</span>
-  <input id="search" placeholder="Search SR, name, keyword...">
-</div>
-
-<div class="chips">
-  <span class="chip" data="Reopen">Reopen</span>
-  <span class="chip" data="Closed">Closed</span>
-  <span class="chip" data="Working">Working</span>
-  <span class="chip" data="Resolution">Resolution</span>
-  <span class="chip" data="Waiting">Waiting</span>
-</div>
-
-<div id="results"></div>
-
-</div>
-
 <script>
+
 let DATA=[],FILTER="";
 
+// load data
 fetch("data.json?v="+Date.now())
 .then(r=>r.json())
 .then(json=>DATA=json);
 
+// highlight
 function hl(text,q){
-  if(!q)return text;
+  if(!q || !text) return text;
   return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
 }
 
+// smart ranking
+function rank(r,q){
+  q=q.toLowerCase();
+  if(r.sr && r.sr.toLowerCase()===q) return 100;
+  if(r.sr && r.sr.toLowerCase().startsWith(q)) return 90;
+  if(r.name && r.name.toLowerCase().startsWith(q)) return 80;
+  if(r.name && r.name.toLowerCase().includes(q)) return 70;
+  if(r.status && r.status.toLowerCase().includes(q)) return 60;
+  return 0;
+}
+
+// search
 function srch(q){
-  if(!q)return[];
-  return DATA.filter(r=>{
+  if(!q) return [];
+  q=q.toLowerCase();
+
+  let res=DATA.filter(r=>{
     let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
            (r.name&&r.name.toLowerCase().includes(q))||
            (r.status&&r.status.toLowerCase().includes(q));
     let f=FILTER? r.status===FILTER:true;
     return ok&&f;
   });
+
+  return res.sort((a,b)=>rank(b,q)-rank(a,q));
 }
 
-function render(r,q){
+// render MULTIPLE results
+function render(list,q){
   let el=document.getElementById("results");
-  if(!r){el.innerHTML="";return;}
 
-  el.innerHTML=`
+  if(!list.length){
+    el.innerHTML="<p>No results found</p>";
+    return;
+  }
+
+  el.innerHTML=list.map(r=>`
   <div class="card">
+
     <div class="header">
       <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
       <div class="badge">${r.status}</div>
@@ -145,26 +77,23 @@ function render(r,q){
       <div class="timeline">
         ${(r.timeline||[]).map(c=>`
           <div class="timeline-item">
-            <b>${c.date}</b> - ${c.text}
+            <b style="color:#2563eb">${c.date||""}</b> ${hl(c.text||"",q)}
           </div>
         `).join("")}
       </div>
     </div>
+
   </div>
-  `;
+  `).join("");
 }
 
+// typing search
 document.getElementById("search").addEventListener("input",function(){
-  let q=this.value.trim().toLowerCase();
-  let res=srch(q);
-
-  if(res.length===1){
-    render(res[0],q);
-  } else {
-    document.getElementById("results").innerHTML="";
-  }
+  let q=this.value.trim();
+  render(srch(q),q);
 });
 
+// chips
 document.querySelectorAll(".chip").forEach(c=>{
   c.onclick=function(){
     document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
@@ -179,7 +108,5 @@ document.querySelectorAll(".chip").forEach(c=>{
     document.getElementById("search").dispatchEvent(new Event("input"));
   }
 });
-</script>
 
-</body>
-</html>
+</script>
