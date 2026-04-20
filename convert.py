@@ -2,34 +2,35 @@ import pandas as pd
 import json
 import os
 
+# Clean text (remove Excel junk)
 def clean_text(val):
     if pd.isna(val):
         return ""
-    return str(val).replace("_x000D_", "").replace("\n", " ").strip()
+    return str(val).replace("_x000D_", "").strip()
 
-def split_timeline(val):
+# Split comments into list (for timeline UI)
+def split_comments(val):
     if pd.isna(val):
         return []
+    
     text = str(val).replace("_x000D_", "\n")
+    
+    # Split by new line
     lines = [x.strip() for x in text.split("\n") if x.strip()]
     
-    timeline = []
-    for line in lines:
-        parts = line.split(" ", 1)
-        timeline.append({
-            "date": parts[0] if len(parts) > 1 else "",
-            "text": parts[1] if len(parts) > 1 else line
-        })
-    return timeline
+    return lines
 
 def convert():
     file_path = 'data.xlsx'
+
     if not os.path.exists(file_path):
+        print("No Excel file found")
         return
 
     df = pd.read_excel(file_path)
 
     data = []
+
     for _, row in df.iterrows():
         data.append({
             "sr": clean_text(row.get('Case Number')),
@@ -39,13 +40,15 @@ def convert():
             "opened": clean_text(row.get('Date/Time Opened')),
             "subject": clean_text(row.get('Subject')),
             "origin": clean_text(row.get('Origin')),
-            "doctorId": clean_text(row.get('Doctor ID')),
+            "doctor_id": clean_text(row.get('Doctor ID')),   # ⚠ matches your HTML
             "reopened": clean_text(row.get('Reopened Date')),
-            "timeline": split_timeline(row.get('app comments'))
+            "comments": split_comments(row.get('app comments'))  # ⚠ matches your HTML
         })
 
     with open('data.json', 'w') as f:
         json.dump(data, f, indent=2)
+
+    print("data.json updated successfully")
 
 if __name__ == "__main__":
     convert()
