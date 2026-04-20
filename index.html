@@ -6,528 +6,262 @@
 <title>SR Tracker</title>
 
 <style>
-* { box-sizing: border-box; }
+*{box-sizing:border-box;}
 
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f5f7fb;
-  margin: 0;
-  padding: 20px;
-  transition: background 0.3s, color 0.3s;
-}
-
-body.dark {
-  background: #0f172a;
-  color: #e2e8f0;
+body{
+  font-family:'Segoe UI', sans-serif;
+  background:#f5f7fb;
+  margin:0;
+  padding:20px;
 }
 
 /* Container */
-.container {
-  max-width: 900px;
-  margin: auto;
-  text-align: center;
+.container{
+  max-width:900px;
+  margin:auto;
+  text-align:center;
 }
 
 /* Header */
-h1 { margin-bottom: 10px; }
-
-/* Theme Toggle */
-.theme-toggle {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  font-family: 'Segoe UI', sans-serif;
-  z-index: 999;
+h1{
+  margin-bottom:10px;
 }
-.theme-toggle:hover { background: #1d4ed8; }
 
 /* Search */
-.search-box {
-  position: relative;
-  margin: 20px auto;
+.search-box{
+  position:relative;
+  margin:20px auto;
 }
 
-.search-box input {
-  width: 100%;
-  padding: 14px 50px;
-  border-radius: 30px;
-  border: 2px solid #ddd;
-  font-size: 16px;
-  font-family: 'Segoe UI', sans-serif;
-  transition: border 0.2s;
-  background: white;
-  color: #111;
-}
-body.dark .search-box input {
-  background: #1e293b;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-.search-box input:focus {
-  outline: none;
-  border-color: #2563eb;
+.search-box input{
+  width:100%;
+  padding:14px 50px;
+  border-radius:30px;
+  border:2px solid #ddd;
+  font-size:16px;
 }
 
-.search-icon {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  animation: pulse 1.5s infinite;
+.search-icon{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:18px;
+  animation:pulse 1.5s infinite;
 }
 
-@keyframes pulse {
-  0%   { transform: translateY(-50%) scale(1); }
-  50%  { transform: translateY(-50%) scale(1.2); }
-  100% { transform: translateY(-50%) scale(1); }
+@keyframes pulse{
+  0%{transform:translateY(-50%) scale(1);}
+  50%{transform:translateY(-50%) scale(1.2);}
+  100%{transform:translateY(-50%) scale(1);}
 }
 
 /* Chips */
-.chips { margin-top: 10px; }
-
-.chip {
-  display: inline-block;
-  padding: 6px 14px;
-  margin: 5px;
-  border-radius: 20px;
-  background: #e2e8f0;
-  cursor: pointer;
-  font-size: 13px;
-  transition: background 0.2s, color 0.2s;
+.chips{
+  margin-top:10px;
 }
-body.dark .chip { background: #334155; color: #cbd5e1; }
-
-.chip.active {
-  background: #2563eb;
-  color: #fff;
+.chip{
+  display:inline-block;
+  padding:6px 12px;
+  margin:5px;
+  border-radius:20px;
+  background:#eee;
+  cursor:pointer;
 }
-
-/* No result */
-.no-result {
-  margin-top: 40px;
-  color: #94a3b8;
-  font-size: 15px;
+.chip.active{
+  background:#2563eb;
+  color:#fff;
 }
 
 /* Card */
-.card {
-  background: white;
-  margin-top: 20px;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: left;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  animation: fadeIn 0.25s ease;
-}
-body.dark .card {
-  background: #1e293b;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+.card{
+  background:white;
+  margin-top:20px;
+  border-radius:12px;
+  padding:20px;
+  text-align:left;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Card header */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+/* Header */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
 }
 
-.sr-number {
-  font-family: monospace;
-  font-size: 14px;
-  font-weight: bold;
-  color: #2563eb;
-  background: #eff6ff;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-body.dark .sr-number {
-  background: #1e3a5f;
-  color: #93c5fd;
+.badge{
+  background:#facc15;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
 }
 
-.doctor-name {
-  font-size: 18px;
-  font-weight: bold;
-  flex: 1;
-  margin-left: 10px;
+/* Responsive Grid */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+  margin-top:10px;
 }
-
-/* Status badge */
-.badge {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.badge-reopen     { background: #fef9c3; color: #854d0e; }
-.badge-closed     { background: #f1f5f9; color: #475569; }
-.badge-open       { background: #dcfce7; color: #166534; }
-.badge-working    { background: #dbeafe; color: #1e40af; }
-.badge-resolution { background: #ede9fe; color: #5b21b6; }
-.badge-waiting    { background: #fce7f3; color: #9d174d; }
-.badge-default    { background: #f1f5f9; color: #475569; }
-
-/* Subject */
-.subject-line {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #475569;
-}
-body.dark .subject-line { color: #94a3b8; }
-.subject-line b { color: #334155; }
-body.dark .subject-line b { color: #cbd5e1; }
-
-/* Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.grid-item {
-  background: #f8fafc;
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-body.dark .grid-item { background: #0f172a; }
-
-.grid-item .label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #94a3b8;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.grid-item .value {
-  font-size: 13px;
-  font-weight: 500;
-  color: #1e293b;
-  word-break: break-word;
-}
-body.dark .grid-item .value { color: #e2e8f0; }
 
 /* Timeline */
-.timeline-section { margin-top: 16px; }
-
-.timeline-title {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #94a3b8;
-  margin-bottom: 10px;
+.timeline{
+  border-left:2px solid #ddd;
+  padding-left:15px;
+  margin-top:10px;
 }
 
-.timeline {
-  border-left: 2px solid #e2e8f0;
-  padding-left: 16px;
-}
-body.dark .timeline { border-left-color: #334155; }
-
-.timeline-item {
-  margin-bottom: 12px;
-  position: relative;
-  font-size: 13px;
-  line-height: 1.5;
+.timeline-item{
+  margin-bottom:10px;
+  position:relative;
 }
 
-.timeline-item::before {
-  content: "";
-  position: absolute;
-  left: -21px;
-  top: 5px;
-  width: 10px;
-  height: 10px;
-  background: #2563eb;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-body.dark .timeline-item::before { border-color: #1e293b; }
-
-.tl-date {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: monospace;
-  color: #2563eb;
-  background: #eff6ff;
-  padding: 1px 7px;
-  border-radius: 4px;
-  margin-bottom: 3px;
-}
-body.dark .tl-date {
-  background: #1e3a5f;
-  color: #93c5fd;
+.timeline-item::before{
+  content:"";
+  position:absolute;
+  left:-9px;
+  top:5px;
+  width:10px;
+  height:10px;
+  background:#2563eb;
+  border-radius:50%;
 }
 
-.tl-text { color: #475569; }
-body.dark .tl-text { color: #94a3b8; }
-
-/* Highlight */
-.hl { background: #fef08a; color: #111; border-radius: 2px; padding: 0 2px; }
-body.dark .hl { background: #854d0e; color: #fef9c3; }
-
-/* Result count */
-.result-count {
-  text-align: left;
-  font-size: 13px;
-  color: #64748b;
-  margin-top: 10px;
+.hl{
+  background:yellow;
 }
 
-/* Mobile */
-@media (max-width: 600px) {
-  h1 { font-size: 22px; }
-  .doctor-name { font-size: 15px; }
+/* Mobile Fix */
+@media(max-width:600px){
+  h1{font-size:22px;}
 }
 </style>
 </head>
 
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Day Mode</button>
-
 <div class="container">
 
-  <h1>🔍 SR Tracker</h1>
+<h1>🔍 SR Tracker</h1>
 
-  <div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input id="search" placeholder="Search SR number, doctor name, status, owner...">
-  </div>
+<div class="search-box">
+  <span class="search-icon">🔍</span>
+  <input id="search" placeholder="Search SR, name, keyword...">
+</div>
 
-  <div class="chips" id="chips">
-    <span class="chip" data-filter="Reopen">🔁 Reopen</span>
-    <span class="chip" data-filter="Closed">✅ Closed</span>
-    <span class="chip" data-filter="Working">⚙️ Working</span>
-    <span class="chip" data-filter="Sent to Resolution">📤 Resolution</span>
-    <span class="chip" data-filter="Waiting on Customer">⏳ Waiting</span>
-  </div>
+<div class="chips">
+  <span class="chip" data="Reopen">Reopen</span>
+  <span class="chip" data="Closed">Closed</span>
+  <span class="chip" data="Working">Working</span>
+  <span class="chip" data="Resolution">Resolution</span>
+  <span class="chip" data="Waiting">Waiting</span>
+</div>
 
-  <div id="results"></div>
+<div id="results"></div>
 
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────────
-var DATA   = [];
-var FILTER = "";
+let DATA=[],FILTER="",IDX={};
 
-// ─── LOAD DATA ───────────────────────────────────────────────
-// Reads data.json produced by convert.py
-// Fields used: sr, name, status, owner, opened, subject,
-//              origin, doctorId, reopened, timeline
-fetch("data.json?v=" + Date.now())
-  .then(function(r) {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  })
-  .then(function(json) {
-    // Supports plain array [] OR { records: [] }
-    DATA = Array.isArray(json) ? json : (json.records || []);
-    renderResults();
-  })
-  .catch(function(err) {
-    document.getElementById("results").innerHTML =
-      '<p style="color:red;margin-top:20px">⚠️ Could not load data.json — ' +
-      err.message + '</p>';
+fetch("data.json?v="+Date.now())
+.then(r=>r.json())
+.then(json=>{
+  DATA=json;
+  json.forEach(r=>{
+    if(r.sr){
+      IDX[r.sr.toLowerCase()]=r;
+      IDX[r.sr.replace(/^SR/i,"").toLowerCase()]=r;
+    }
   });
+});
 
-// ─── THEME ───────────────────────────────────────────────────
-function toggleTheme() {
-  var isDark = document.body.classList.toggle("dark");
-  document.getElementById("themeBtn").textContent = isDark ? "☀️ Day Mode" : "🌙 Dark Mode";
-  localStorage.setItem("sr_theme", isDark ? "dark" : "light");
+function hl(text,q){
+  if(!q) return text;
+  return text.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
 }
-// Restore saved theme
-(function() {
-  if (localStorage.getItem("sr_theme") === "dark") {
-    document.body.classList.add("dark");
-    document.getElementById("themeBtn").textContent = "☀️ Day Mode";
+
+function srch(q){
+  if(!q) return [];
+  return DATA.filter(r=>{
+    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
+           (r.name&&r.name.toLowerCase().includes(q))||
+           (r.status&&r.status.toLowerCase().includes(q));
+    let f=FILTER? r.status===FILTER:true;
+    return ok&&f;
+  });
+}
+
+function render(r,q){
+  let el=document.getElementById("results");
+
+  if(!r){
+    el.innerHTML="";
+    return;
   }
-})();
 
-// ─── HELPERS ─────────────────────────────────────────────────
-function esc(s) {
-  return String(s || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  el.innerHTML=`
+  <div class="card">
+
+    <div class="header">
+      <div><b>${hl(r.sr,q)}</b> ${hl(r.name||"",q)}</div>
+      <div class="badge">${r.status}</div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b>Subject:</b> ${r.subject||"-"}
+    </div>
+
+    <div class="grid">
+      <div><b>Owner</b><br>${r.owner||"-"}</div>
+      <div><b>Opened</b><br>${r.opened||"-"}</div>
+      <div><b>Reopened</b><br>${r.reopened||"-"}</div>
+      <div><b>Origin</b><br>${r.origin||"-"}</div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <b>Doctor ID:</b> ${r.doctor_id||"-"}
+    </div>
+
+    <div style="margin-top:10px;">
+      <b>Activity Timeline</b>
+      <div class="timeline">
+        ${(r.comments||[]).map(c=>`
+          <div class="timeline-item">${c}</div>
+        `).join("")}
+      </div>
+    </div>
+
+  </div>
+  `;
 }
 
-function highlight(text, q) {
-  if (!q || !text) return esc(text);
-  var safe = esc(String(text));
-  var words = q.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 1; });
-  words.forEach(function(w) {
-    var re = new RegExp("(" + w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")", "gi");
-    safe = safe.replace(re, "<span class='hl'>$1</span>");
-  });
-  return safe;
-}
+document.getElementById("search").addEventListener("input",function(){
+  let q=this.value.trim().toLowerCase();
+  let res=srch(q);
 
-function badgeClass(status) {
-  var s = (status || "").toLowerCase();
-  if (s.includes("reopen"))     return "badge-reopen";
-  if (s === "closed")           return "badge-closed";
-  if (s === "open")             return "badge-open";
-  if (s.includes("working"))    return "badge-working";
-  if (s.includes("resolution")) return "badge-resolution";
-  if (s.includes("waiting"))    return "badge-waiting";
-  return "badge-default";
-}
+  if(res.length===1){
+    render(res[0],q);
+  } else {
+    document.getElementById("results").innerHTML="";
+  }
+});
 
-// ─── SEARCH ──────────────────────────────────────────────────
-function doSearch() {
-  var q = document.getElementById("search").value.trim().toLowerCase();
+document.querySelectorAll(".chip").forEach(c=>{
+  c.onclick=function(){
+    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
 
-  return DATA.filter(function(r) {
-    if (!r.sr) return false;
-
-    // Filter chip
-    if (FILTER) {
-      var st = (r.status || "").toLowerCase();
-      var fl = FILTER.toLowerCase();
-      if (!st.includes(fl)) return false;
+    if(FILTER===this.dataset.data){
+      FILTER="";
+    } else {
+      FILTER=this.dataset.data;
+      this.classList.add("active");
     }
 
-    // No query → show all (when a chip is active)
-    if (!q) return !!FILTER;
-
-    // Search across all fields
-    var haystack = [
-      r.sr, r.name, r.status, r.owner,
-      r.opened, r.subject, r.origin,
-      r.doctorId, r.reopened
-    ].join(" ").toLowerCase();
-
-    // Also search inside timeline text
-    (r.timeline || []).forEach(function(t) {
-      haystack += " " + (t.text || "").toLowerCase();
-    });
-
-    var words = q.split(/\s+/).filter(function(w){ return w.length > 0; });
-    return words.every(function(w){ return haystack.includes(w); });
-  });
-}
-
-// ─── RENDER ──────────────────────────────────────────────────
-function renderResults() {
-  var q       = document.getElementById("search").value.trim();
-  var results = doSearch();
-  var el      = document.getElementById("results");
-
-  // Show nothing if no query and no filter
-  if (!q && !FILTER) {
-    el.innerHTML = "";
-    return;
+    document.getElementById("search").dispatchEvent(new Event("input"));
   }
-
-  if (!results.length) {
-    el.innerHTML = '<div class="no-result">🔍 No cases found. Try a different keyword.</div>';
-    return;
-  }
-
-  var html = '<div class="result-count">' + results.length +
-    ' case' + (results.length > 1 ? 's' : '') + ' found</div>';
-
-  results.forEach(function(r) {
-    // Timeline rows
-    var tlHTML = "";
-    (r.timeline || []).forEach(function(t) {
-      if (!t.text) return;
-      tlHTML +=
-        '<div class="timeline-item">' +
-          (t.date ? '<div class="tl-date">' + esc(t.date) + '</div>' : '') +
-          '<div class="tl-text">' + highlight(t.text, q) + '</div>' +
-        '</div>';
-    });
-
-    html +=
-      '<div class="card">' +
-
-        // Header: SR + Name + Status
-        '<div class="card-header">' +
-          '<span class="sr-number">' + highlight(r.sr, q) + '</span>' +
-          '<span class="doctor-name">' + highlight(r.name, q) + '</span>' +
-          '<span class="badge ' + badgeClass(r.status) + '">' + esc(r.status) + '</span>' +
-        '</div>' +
-
-        // Subject
-        '<div class="subject-line">' +
-          '<b>Subject:</b> ' + highlight(r.subject, q) +
-        '</div>' +
-
-        // Fields grid — all 6 fields from convert.py
-        '<div class="grid">' +
-          '<div class="grid-item"><div class="label">Owner</div>' +
-            '<div class="value">' + highlight(r.owner, q) + '</div></div>' +
-          '<div class="grid-item"><div class="label">Opened</div>' +
-            '<div class="value">' + esc(r.opened) + '</div></div>' +
-          '<div class="grid-item"><div class="label">Reopened</div>' +
-            '<div class="value">' + esc(r.reopened || "—") + '</div></div>' +
-          '<div class="grid-item"><div class="label">Origin</div>' +
-            '<div class="value">' + highlight(r.origin, q) + '</div></div>' +
-          '<div class="grid-item"><div class="label">Doctor ID</div>' +
-            '<div class="value" style="font-family:monospace;font-size:12px">' +
-            highlight(r.doctorId, q) + '</div></div>' +
-        '</div>' +
-
-        // Timeline
-        (tlHTML ?
-          '<div class="timeline-section">' +
-            '<div class="timeline-title">📋 Activity Timeline</div>' +
-            '<div class="timeline">' + tlHTML + '</div>' +
-          '</div>'
-        : '') +
-
-      '</div>';
-  });
-
-  el.innerHTML = html;
-}
-
-// ─── EVENTS ──────────────────────────────────────────────────
-document.getElementById("search").addEventListener("input", renderResults);
-
-document.getElementById("chips").addEventListener("click", function(e) {
-  var chip = e.target.closest(".chip");
-  if (!chip) return;
-
-  var val = chip.dataset.filter;
-
-  // Toggle off if already active
-  if (FILTER === val) {
-    FILTER = "";
-    chip.classList.remove("active");
-  } else {
-    FILTER = val;
-    document.querySelectorAll(".chip").forEach(function(c) {
-      c.classList.remove("active");
-    });
-    chip.classList.add("active");
-  }
-
-  renderResults();
 });
 </script>
 
