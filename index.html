@@ -26,35 +26,29 @@ body{
 
 .search-box input{
   width:100%;
-  padding:14px 50px;
+  padding:14px 20px 14px 50px;
   border-radius:30px;
   border:2px solid #e5e7eb;
   font-size:15px;
   outline:none;
 }
 
-.search-box input:focus{
-  border-color:#4285f4;
-  box-shadow:0 0 0 3px rgba(66,133,244,0.2);
-}
-
-/* Google color animated icon */
+/* GOOGLE STYLE GLOW ICON */
 .search-icon{
   position:absolute;
   left:15px;
   top:50%;
   transform:translateY(-50%);
-  font-weight:bold;
-  font-size:18px;
-  animation:googleColor 2s infinite;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:conic-gradient(#4285F4,#EA4335,#FBBC05,#34A853,#4285F4);
+  animation:spin 3s linear infinite;
+  filter:blur(1px);
 }
 
-@keyframes googleColor{
-  0%{color:#4285F4;}
-  25%{color:#EA4335;}
-  50%{color:#FBBC05;}
-  75%{color:#34A853;}
-  100%{color:#4285F4;}
+@keyframes spin{
+  100%{transform:translateY(-50%) rotate(360deg);}
 }
 
 /* CHIPS */
@@ -87,7 +81,6 @@ body{
   font-size:14px;
 }
 
-/* HEADER */
 .card-top{
   display:flex;
   justify-content:space-between;
@@ -101,7 +94,6 @@ body{
   font-size:11px;
 }
 
-/* SUBJECT */
 .subject{
   background:#f8fafc;
   padding:10px 16px;
@@ -110,7 +102,6 @@ body{
   font-size:13px;
 }
 
-/* GRID */
 .info{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -135,21 +126,13 @@ body{
   font-size:13px;
 }
 
-/* DOCTOR */
 .doc{
   padding:10px 16px;
   border-bottom:1px solid #eee;
 }
 
-/* TIMELINE */
 .timeline{
   padding:14px 16px;
-}
-
-.timeline-title{
-  font-size:11px;
-  color:#888;
-  margin-bottom:10px;
 }
 
 .timeline-item{
@@ -169,23 +152,16 @@ body{
 .date{
   font-size:12px;
   color:#2563eb;
-  display:block;
 }
 
 .text{
   font-size:13px;
-  color:#333;
 }
 
-.hl{
-  background:yellow;
-}
+.hl{background:yellow;}
 
-/* MOBILE */
 @media(max-width:600px){
-  .info{
-    grid-template-columns:1fr 1fr;
-  }
+  .info{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -197,16 +173,16 @@ body{
 <h2>SR Tracker</h2>
 
 <div class="search-box">
-  <span class="search-icon">G</span>
+  <div class="search-icon"></div>
   <input id="search" placeholder="Search SR number, name...">
 </div>
 
 <div class="chips">
-  <span class="chip" data="Reopen">Reopen</span>
-  <span class="chip" data="Closed">Closed</span>
-  <span class="chip" data="Working">Working</span>
-  <span class="chip" data="Resolution">Resolution</span>
-  <span class="chip" data="Waiting">Waiting</span>
+  <span class="chip" data="reopen">Reopen</span>
+  <span class="chip" data="closed">Closed</span>
+  <span class="chip" data="working">Working</span>
+  <span class="chip" data="resolution">Resolution</span>
+  <span class="chip" data="waiting">Waiting</span>
 </div>
 
 <div id="results"></div>
@@ -221,6 +197,11 @@ fetch("data.json?v="+Date.now())
 .then(r=>r.json())
 .then(json=>DATA=json);
 
+/* normalize status */
+function normalize(s){
+  return (s||"").toLowerCase().replace(/[^a-z]/g,"");
+}
+
 function hl(t,q){
   if(!q) return t;
   return t.replace(new RegExp(q,"ig"),m=>"<span class='hl'>"+m+"</span>");
@@ -228,16 +209,21 @@ function hl(t,q){
 
 function srch(q){
   q=q.toLowerCase();
+
   return DATA.filter(r=>{
-    let ok=(r.sr&&r.sr.toLowerCase().includes(q))||
-           (r.name&&r.name.toLowerCase().includes(q));
-    let f=FILTER? r.status===FILTER:true;
-    return ok && f;
+    let matchSearch =
+      (r.sr&&r.sr.toLowerCase().includes(q)) ||
+      (r.name&&r.name.toLowerCase().includes(q));
+
+    let matchFilter = FILTER
+      ? normalize(r.status).includes(FILTER)
+      : true;
+
+    return matchSearch && matchFilter;
   });
 }
 
 function render(list,q){
-
   let el=document.getElementById("results");
 
   if(!list.length){
@@ -272,8 +258,6 @@ function render(list,q){
     </div>
 
     <div class="timeline">
-      <div class="timeline-title">Activity Timeline</div>
-
       ${(r.comments||[]).map(c=>{
         let parts=c.split(" ");
         let date=parts[0];
@@ -283,12 +267,11 @@ function render(list,q){
         <div class="timeline-item">
           <div class="dot"></div>
           <div>
-            <span class="date">${date}</span>
-            <span class="text">${hl(text,q)}</span>
+            <div class="date">${date}</div>
+            <div class="text">${hl(text,q)}</div>
           </div>
         </div>`;
       }).join("")}
-
     </div>
 
   </div>
@@ -300,11 +283,19 @@ document.getElementById("search").addEventListener("input",function(){
   render(srch(this.value),this.value);
 });
 
+/* CHIP FIX */
 document.querySelectorAll(".chip").forEach(c=>{
   c.onclick=function(){
-    FILTER = FILTER===this.dataset.data ? "" : this.dataset.data;
-    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-    if(FILTER) this.classList.add("active");
+
+    if(FILTER===this.dataset.data){
+      FILTER="";
+      this.classList.remove("active");
+    }else{
+      FILTER=this.dataset.data;
+      document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+      this.classList.add("active");
+    }
+
     document.getElementById("search").dispatchEvent(new Event("input"));
   }
 });
